@@ -15,7 +15,7 @@ class Wel4Page extends StatelessWidget {
           SizedBox.expand(
             child: Image.asset(
               "assets/images/wel4_page.png", 
-             fit: BoxFit.contain, 
+             fit: BoxFit.fitWidth, 
               alignment: Alignment.center,
             ),
           ),
@@ -46,19 +46,19 @@ class Wel4Page extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 30,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     height: 1.3,
                   ),
                 ),
                 const SizedBox(height: 15),
                 const Text(
-                  "Lose weight and get fit with sandow! 🥒",
+                  "Lose weight and get fit with gymunity! 🥒",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 15,
+                    fontSize: 12,
                     height: 1.5,
                   ),
                 ),
@@ -70,7 +70,7 @@ class Wel4Page extends StatelessWidget {
                   children: [
                     
                     Container(
-                      width: 140,
+                      width: 120,
                       height: 65,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),
@@ -95,7 +95,7 @@ class Wel4Page extends StatelessWidget {
                     const SizedBox(width: 25),
                  
                     Container(
-                      width: 140,
+                      width: 120,
                       height: 65,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),

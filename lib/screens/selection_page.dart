@@ -29,7 +29,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: "Work Sans",
-                  fontSize: 26,
+                  fontSize: 23,
                   fontWeight: FontWeight.w700,
                 ),
               ),

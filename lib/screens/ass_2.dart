@@ -71,7 +71,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
               ),
             ),
 
-            const SizedBox(height:100),
+            const SizedBox(height:60),
 
             if (showSkipBar)
               Padding(
@@ -134,7 +134,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
               },
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 10),
           ],
         ),
       ),

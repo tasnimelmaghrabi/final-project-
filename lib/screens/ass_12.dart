@@ -115,10 +115,10 @@ class SupplementPageState extends State<SupplementPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
                   SizedBox(
-                    height: 240,
+                    height: 230,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Wrap(

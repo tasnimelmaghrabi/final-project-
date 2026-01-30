@@ -27,22 +27,22 @@ class PrevExperience extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
 
             Image.asset(
               "assets/images/gym _workout _emblem.png",
-              width: 400,
-              height: 400,
+              width: 320,
+              height: 320,
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 
                 CustomButton(
-                  width: 150,
+                  width: 120,
                   text: "No ✖",
                   onTap: () {
                     print("PrevExperience : No");
@@ -57,7 +57,7 @@ class PrevExperience extends StatelessWidget {
                 const SizedBox(width: 15),
                 
                 CustomButton(
-                  width: 150,
+                  width: 120,
                   text: "Yes ✓",
                   onTap: () {
                     print("PrevExperience : Yes");

@@ -39,7 +39,7 @@ class _SleepQualityPageState extends State<SleepQualityPage> {
               style: TextStyle(
                 fontFamily: "Work Sans",
                 fontSize: 30,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 30),
@@ -59,13 +59,13 @@ class _SleepQualityPageState extends State<SleepQualityPage> {
                           setState(() => selectedIndex = index);
                         },
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 6),
                     ],
                   ),
                 ),
               ),
             ),
-            const Spacer(),
+                const SizedBox(height: 10),
             CustomButton(
               text: "Continue ➜",
               onTap: () {
@@ -85,7 +85,7 @@ class _SleepQualityPageState extends State<SleepQualityPage> {
                 }
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -130,7 +130,7 @@ class SleepItem extends StatelessWidget {
             Icon(
               icon,
               color: isSelected ? Colors.white : Colors.grey[700],
-              size: 28,
+              size: 23,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -138,7 +138,7 @@ class SleepItem extends StatelessWidget {
                 text,
                 style: TextStyle(
                   fontFamily: "Work Sans",
-                  fontSize: 17,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: isSelected ? Colors.white : Colors.grey[850],
                 ),
@@ -148,7 +148,7 @@ class SleepItem extends StatelessWidget {
               children: [
                 Icon(
                   Icons.nights_stay,
-                  size: 18,
+                  size: 14,
                   color: isSelected ? Colors.white : Colors.grey[700],
                 ),
                 const SizedBox(width: 6),

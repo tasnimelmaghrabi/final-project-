@@ -63,7 +63,7 @@ class _Ass7State extends State<Ass7> {
               },
             ),
 
-            SizedBox(height: 40),
+            SizedBox(height: 20),
           ],
         ),
       ),

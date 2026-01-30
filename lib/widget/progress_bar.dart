@@ -7,10 +7,12 @@ class ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width; 
+
     return Positioned(
       top: 50,
-      left: 160,
-      right: 160,
+      left: screenWidth * 0.25,   
+      right: screenWidth * 0.25,  
       child: Stack(
         children: [
           Container(

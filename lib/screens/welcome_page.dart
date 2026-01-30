@@ -17,7 +17,7 @@ class WelcomePage extends StatelessWidget {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/woman_welcome.png'),
-                fit: BoxFit.contain,
+                fit: BoxFit.fill,
               ),
             ),
           ),
@@ -48,17 +48,17 @@ class WelcomePage extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 35,
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  "GymUnity.ai UI Kit!",
+                  "GymUnity.ai ",
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 30,
+                    fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -69,7 +69,7 @@ class WelcomePage extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 15,
+                    fontSize: 13,
                   ),
                 ),
 
@@ -126,6 +126,7 @@ class WelcomePage extends StatelessWidget {
                         fontFamily: "Work Sans",
                         color: Colors.white70,
                         fontSize: 14,
+                        fontWeight: FontWeight.bold
                       ),
                     ),
                     GestureDetector(

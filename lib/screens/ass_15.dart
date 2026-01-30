@@ -60,7 +60,7 @@ class BodyAnalysisPageState extends State<BodyAnalysisPage> {
                     children: [
                       Image.asset(
                         "assets/images/full _body_ shot .png",
-                        height: 300,
+                        height: 200,
                         fit: BoxFit.cover,
                       ),
                       Positioned(
@@ -84,7 +84,7 @@ class BodyAnalysisPageState extends State<BodyAnalysisPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
 
                   buildCheckItem(
                     "720p Camera",

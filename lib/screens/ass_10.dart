@@ -50,10 +50,10 @@ class ExercisePreferencePageState extends State<ExercisePreferencePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 35),
+                  const SizedBox(height: 25),
 
                   SizedBox(
-                    height: 400, 
+                    height: 370, 
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: exercises.length,
@@ -61,7 +61,7 @@ class ExercisePreferencePageState extends State<ExercisePreferencePage> {
                         crossAxisCount: 3,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
-                        mainAxisExtent: 130,
+                        mainAxisExtent: 110,
                       ),
                       itemBuilder: (context, index) {
                         bool isSelected = selectedIndex == index;
@@ -89,17 +89,17 @@ class ExercisePreferencePageState extends State<ExercisePreferencePage> {
                               children: [
                                 Icon(
                                   exercises[index]["icon"],
-                                  size: 32,
+                                  size: 30,
                                   color: isSelected
                                       ? Colors.white
                                       : const Color(0xffBABBBE),
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 4),
                                 Text(
                                   exercises[index]["title"],
                                   style: TextStyle(
                                     fontFamily: "Work Sans",
-                                    fontSize: 15,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: isSelected
                                         ? Colors.white

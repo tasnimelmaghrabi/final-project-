@@ -25,7 +25,7 @@ class _Ass4State extends State<Ass4> {
       totalSteps: 15,
     ),
    
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             const Text(
               "What is your age?",
@@ -40,7 +40,7 @@ class _Ass4State extends State<Ass4> {
             const SizedBox(height: 55),
 
             SizedBox(
-              height: 350,
+              height: 340,
               child: ListWheelScrollView.useDelegate(
                 itemExtent: 100,
                 physics: const FixedExtentScrollPhysics(),
@@ -86,7 +86,7 @@ class _Ass4State extends State<Ass4> {
               ),
             ),
 
-            const SizedBox(height: 45),
+            const SizedBox(height: 35),
 
             Padding(
               padding: const EdgeInsets.only(bottom: 45, left: 30, right: 30),

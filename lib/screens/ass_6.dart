@@ -10,7 +10,7 @@ class FitnessLevelPage extends StatefulWidget {
 }
 
 class _FitnessLevelPageState extends State<FitnessLevelPage> {
-  double _value = 3.0;
+  double _value = 1.0;
 
  
   String getFitnessDescription(double value) {
@@ -49,7 +49,7 @@ class _FitnessLevelPageState extends State<FitnessLevelPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 60),
+            const SizedBox(height: 30),
 
             Column(
               children: [
@@ -91,7 +91,7 @@ class _FitnessLevelPageState extends State<FitnessLevelPage> {
               },
             ),
 
-            const SizedBox(height: 60),
+            const SizedBox(height: 30),
 
             CustomButton(
               text: "Continue ➜",

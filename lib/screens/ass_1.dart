@@ -64,7 +64,7 @@ class FitGoalPageState extends State<FitGoalPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
             CustomButton(
               text: "Continue ➜",
               onTap: () {

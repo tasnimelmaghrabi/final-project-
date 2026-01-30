@@ -16,7 +16,7 @@ class Wel2Page extends StatelessWidget {
           SizedBox.expand(
             child: Image.asset(
               "assets/images/wel2_page.png", 
-               fit: BoxFit.contain, 
+               fit: BoxFit.fitWidth, 
               alignment: Alignment.center,
             ),
           ),
@@ -48,7 +48,7 @@ class Wel2Page extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 30,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     height: 1.3,
                   ),
@@ -60,7 +60,7 @@ class Wel2Page extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: "Work Sans",
                     color: Colors.white,
-                    fontSize: 15,
+                    fontSize: 12,
                     height: 1.5,
                   ),
                 ),
@@ -72,7 +72,7 @@ class Wel2Page extends StatelessWidget {
                   children: [
                     
                     Container(
-                      width: 140,
+                      width: 120,
                       height: 65,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),
@@ -97,7 +97,7 @@ class Wel2Page extends StatelessWidget {
                     const SizedBox(width: 25),
                     
                     Container(
-                      width: 140,
+                      width: 120,
                       height: 65,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.9),

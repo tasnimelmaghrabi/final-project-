@@ -78,7 +78,7 @@ class _WeightGoalPageState extends State<WeightGoalPage> {
               SizedBox(height: 45),
               
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(7),
                 child: Container(
                   padding: EdgeInsets.all(7),
                   decoration: BoxDecoration(
@@ -219,7 +219,7 @@ class _WeightGoalPageState extends State<WeightGoalPage> {
                 ],
               ),
 
-              SizedBox(height: 60),
+              SizedBox(height: 20),
               
               CustomButton(
                 text: "Continue ➜",

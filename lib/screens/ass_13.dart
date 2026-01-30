@@ -10,7 +10,7 @@ class CalorieGoalPage extends StatefulWidget {
 
 class _CalorieGoalPageState extends State<CalorieGoalPage> {
   bool isKcal = true;
-  int valueKcal = 1500;
+  int valueKcal = 1550;
 
   String? lastPressed;
 
@@ -206,7 +206,7 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
 
                   CustomButton(
                     text: "Continue ➜",

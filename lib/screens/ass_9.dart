@@ -58,44 +58,45 @@ class CommitmentScreenState extends State<CommitmentScreen> {
                   const SizedBox(height: 40),
 
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xffF3F3F4),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        int number = index + 1;
-                        bool active = number == selected;
-
-                        return GestureDetector(
-                          onTap: () => setState(() => selected = number),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 60,
-                            height: 60,
-                            alignment: Alignment.center,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: active ? Color(0xff2563EB) : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              "$number",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: active ? Colors.white : Color(0xffBABBBE),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF3F3F4),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(5, (index) {
+                          int number = index + 1;
+                          bool active = number == selected;
+                    
+                          return GestureDetector(
+                            onTap: () => setState(() => selected = number),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 45,
+                              height: 60,
+                              alignment: Alignment.center,
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                color: active ? Color(0xff2563EB) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                "$number",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: active ? Colors.white : Color(0xffBABBBE),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                     ),
-                  ),
+                 
 
                   const SizedBox(height: 20),
 

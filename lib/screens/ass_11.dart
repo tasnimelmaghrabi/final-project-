@@ -36,17 +36,17 @@ class Ass11 extends StatelessWidget {
 
             Image.asset(
               "assets/images/Rectangle.png",
-              width: 400,
-              height: 400,
+              width: 320,
+              height: 320,
             ),
 
-            SizedBox(height: 30),
+            SizedBox(height: 10),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomButton(
-                  width: 150,
+                  width: 120,
                   text: "No ✖",
                   onTap: () {
                     print("take supplements: NO");  
@@ -60,7 +60,7 @@ class Ass11 extends StatelessWidget {
                 ),
                 SizedBox(width: 15),
                 CustomButton(
-                  width: 150,
+                  width: 120,
                   text: "Yes ✓",
                   onTap: () {
                     print("take supplements: YES");  
