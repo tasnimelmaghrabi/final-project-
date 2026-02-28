@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gymunity/screens/ass_15.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gymunity/services/firestore_service.dart';
+import 'home_page.dart';
 
 class SleepQualityPage extends StatefulWidget {
+  const SleepQualityPage({super.key});
+
   @override
   State<SleepQualityPage> createState() => _SleepQualityPageState();
 }
@@ -12,13 +15,49 @@ class SleepQualityPage extends StatefulWidget {
 class _SleepQualityPageState extends State<SleepQualityPage> {
   int selectedIndex = -1;
 
+  final FirestoreService _firestoreService = FirestoreService();
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
+
   final List<Map<String, dynamic>> sleepOptions = [
-    {"text": "Excellent", "icon": Icons.sentiment_satisfied_alt, "hours": "> 8 hours"},
-    {"text": "Great", "icon": Icons.sentiment_satisfied, "hours": "7–8 hours"},
-    {"text": "Normal", "icon": Icons.sentiment_neutral, "hours": "6–7 hours"},
-    {"text": "Bad", "icon": Icons.sentiment_dissatisfied, "hours": "3–4 hours"},
-    {"text": "Insomniac", "icon": Icons.sentiment_very_dissatisfied, "hours": "< 2 hours"},
+    {
+      "text": "Excellent",
+      "icon": Icons.sentiment_satisfied_alt,
+      "hours": "> 8 hours"
+    },
+    {
+      "text": "Great",
+      "icon": Icons.sentiment_satisfied,
+      "hours": "7–8 hours"
+    },
+    {
+      "text": "Normal",
+      "icon": Icons.sentiment_neutral,
+      "hours": "6–7 hours"
+    },
+    {
+      "text": "Bad",
+      "icon": Icons.sentiment_dissatisfied,
+      "hours": "3–4 hours"
+    },
+    {
+      "text": "Insomniac",
+      "icon": Icons.sentiment_very_dissatisfied,
+      "hours": "< 2 hours"
+    },
   ];
+
+  Future<void> _saveSleepQuality() async {
+    if (selectedIndex == -1) return;
+
+    await _firestoreService.saveAnswer(
+      uid: uid,
+      fieldName: "sleep_quality",
+      value: {
+        "text": sleepOptions[selectedIndex]["text"],
+        "hours": sleepOptions[selectedIndex]["hours"],
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +66,8 @@ class _SleepQualityPageState extends State<SleepQualityPage> {
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(
-      currentStep: 14,
-      totalSteps: 15,
-    ),
-   
+            AppBarrr(currentStep: 14, totalSteps: 14),
+
             const SizedBox(height: 20),
             const Text(
               "What’s your sleep\nquality like?",
@@ -42,7 +78,9 @@ class _SleepQualityPageState extends State<SleepQualityPage> {
                 fontWeight: FontWeight.w700,
               ),
             ),
+
             const SizedBox(height: 30),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -65,26 +103,37 @@ class _SleepQualityPageState extends State<SleepQualityPage> {
                 ),
               ),
             ),
-                const SizedBox(height: 10),
+
+            const SizedBox(height: 20),
+
             CustomButton(
-              text: "Continue ➜",
-              onTap: () {
-                if (selectedIndex != -1) {
+              text: "Finish",
+              onTap: () async {
+                if (selectedIndex == -1) return;
 
-                  print("sleep quality: ${sleepOptions[selectedIndex]["text"]}");
+                try {
+                  // 1️⃣ حفظ جودة النوم
+                  await _saveSleepQuality();
 
-                  Navigator.push(
+                  // 2️⃣ تحديد إن الـ onboarding خلص
+                  await _firestoreService.setOnboardingCompleted(uid);
+
+                  // 3️⃣ الانتقال للـ HomePage
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => BodyAnalysisPage(
-                      ),
+                    MaterialPageRoute(builder: (_) => const HomePage()),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Something went wrong. Please try again."),
+                      backgroundColor: Colors.red,
                     ),
                   );
-                } else {
-                  print("No sleep quality selected yet!");
                 }
               },
             ),
+
             const SizedBox(height: 30),
           ],
         ),

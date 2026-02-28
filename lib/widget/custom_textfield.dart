@@ -1,61 +1,73 @@
 import 'package:flutter/material.dart';
 
-class CustomTextfield extends StatefulWidget {
-  final String hinttext;
-  final bool ispassword;
-  final TextEditingController controller;
+class CustomTextField extends StatefulWidget {
+  final String label;
+  final String hintText;
   final IconData? icon;
-  final bool hasError;
+  final bool isPassword;
+  final TextEditingController controller;
 
-  const CustomTextfield({
+  const CustomTextField({
     super.key,
-    required this.hinttext,
-    this.ispassword = false,
+    required this.label,
+    required this.hintText,
     required this.controller,
     this.icon,
-    this.hasError = false,
+    this.isPassword = false,
   });
 
   @override
-  State<CustomTextfield> createState() => CustomTextfieldState();
+  State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
-class CustomTextfieldState extends State<CustomTextfield> {
-  bool obscureText = true; 
+class _CustomTextFieldState extends State<CustomTextField> {
+  bool obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: widget.controller,
-      obscureText: widget.ispassword ? obscureText : false,
-      obscuringCharacter: '*',
-      decoration: InputDecoration(
-        hintText: widget.hinttext,
-        prefixIcon: widget.icon != null ? Icon(widget.icon, color: Colors.grey) : null,
-        filled: true,
-        fillColor: const Color(0xffF3F3F4),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.grey),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFF97316), width: 2),
+        const SizedBox(height: 6),
+        TextField(
+          controller: widget.controller,
+          obscureText: widget.isPassword ? obscureText : false,
+          obscuringCharacter: '*',
+          decoration: InputDecoration(
+            hintText: widget.hintText,
+            prefixIcon: widget.icon == null
+                ? null
+                : Icon(widget.icon, color: Colors.grey),
+            filled: true,
+            fillColor: const Color(0xffF3F3F4),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      obscureText
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        obscureText = !obscureText;
+                      });
+                    },
+                  )
+                : null,
+          ),
         ),
-        suffixIcon: widget.ispassword
-            ? GestureDetector(
-                onTap: () {
-                  setState(() {
-                    obscureText = !obscureText; 
-                  });
-                },
-                child: Icon(
-                  obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
-                ),
-              )
-            : null,
-      ),
+      ],
     );
   }
 }

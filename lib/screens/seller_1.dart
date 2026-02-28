@@ -1,56 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:gymunity/screens/ass_11.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gymunity/screens/seller_2.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gymunity/services/firestore_service.dart';
 
-class ExercisePreferencePage extends StatefulWidget {
-  const ExercisePreferencePage({super.key});
+class SellerFitnessCategoryPage extends StatefulWidget {
+  const SellerFitnessCategoryPage({super.key});
 
   @override
-  ExercisePreferencePageState createState() => ExercisePreferencePageState();
+  SellerFitnessCategoryPageState createState() =>
+      SellerFitnessCategoryPageState();
 }
 
-class ExercisePreferencePageState extends State<ExercisePreferencePage> {
-  int? selectedIndex;
+class SellerFitnessCategoryPageState
+    extends State<SellerFitnessCategoryPage> {
+  Set<int> selectedIndexes = {};
+
+ 
   final FirestoreService _firestoreService = FirestoreService();
 
-  final List<Map<String, dynamic>> exercises = [
-    {"title": "Jogging", "icon": Icons.directions_run},
-    {"title": "Walking", "icon": Icons.directions_walk},
-    {"title": "Hiking", "icon": Icons.terrain},
-    {"title": "Skating", "icon": Icons.skateboarding},
-    {"title": "Biking", "icon": Icons.pedal_bike},
-    {"title": "Weightlift", "icon": Icons.fitness_center},
-    {"title": "Cardio", "icon": Icons.monitor_heart},
-    {"title": "Yoga", "icon": Icons.self_improvement},
+  final List<Map<String, dynamic>> categories = [
+    {"title": "Supplements", "icon": Icons.local_drink},
+    {"title": "Fitness Equipment", "icon": Icons.fitness_center},
+    {"title": "Sportswear", "icon": Icons.checkroom},
+    {"title": "Healthy Meals / Food", "icon": Icons.restaurant},
+    {"title": "Training Programs", "icon": Icons.assignment},
     {"title": "Other", "icon": Icons.settings},
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPreviousSelection();
-  }
-
-  // تحميل الاختيار السابق من Firestore
-  void _loadPreviousSelection() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final previous = await _firestoreService.getAnswer(
-      uid: uid,
-      fieldName: "exercise_preference",
-    );
-
-    if (previous != null) {
-      final index = exercises.indexWhere((e) => e["title"] == previous);
-      if (index != -1) {
-        setState(() {
-          selectedIndex = index;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,40 +36,58 @@ class ExercisePreferencePageState extends State<ExercisePreferencePage> {
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(currentStep: 10, totalSteps: 14),
+            AppBarrr(currentStep: 1, totalSteps: 4),
             const SizedBox(height: 20),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const Center(
+                    child: Text(
+                      "What do you sell in the\nFitness field?",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: "Work Sans",
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                   const Text(
-                    "Do you have a specific\nExercise Preference?",
-                    textAlign: TextAlign.center,
+                    "(Choose one or more)",
                     style: TextStyle(
-                      fontFamily: "Work Sans",
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color(0xff9CA3AF),
                     ),
                   ),
                   const SizedBox(height: 25),
-
                   SizedBox(
-                    height: 370,
+                    height: 350,
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: exercises.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
+                      itemCount: categories.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 6,
+                        crossAxisSpacing: 6,
                         mainAxisExtent: 110,
                       ),
                       itemBuilder: (context, index) {
-                        bool isSelected = selectedIndex == index;
+                        bool isSelected = selectedIndexes.contains(index);
 
                         return GestureDetector(
-                          onTap: () => setState(() => selectedIndex = index),
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                selectedIndexes.remove(index);
+                              } else {
+                                selectedIndexes.add(index);
+                              }
+                            });
+                          },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 220),
                             padding: const EdgeInsets.symmetric(
@@ -113,22 +108,24 @@ class ExercisePreferencePageState extends State<ExercisePreferencePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  exercises[index]["icon"],
+                                  categories[index]["icon"],
                                   size: 30,
                                   color: isSelected
                                       ? Colors.white
                                       : const Color(0xffBABBBE),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 6),
                                 Text(
-                                  exercises[index]["title"],
+                                  categories[index]["title"],
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: "Work Sans",
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: isSelected
                                         ? Colors.white
-                                        : const Color(0xff97989A),
+                                        : const Color.fromARGB(
+                                            255, 151, 152, 154),
                                   ),
                                 ),
                               ],
@@ -138,46 +135,53 @@ class ExercisePreferencePageState extends State<ExercisePreferencePage> {
                       },
                     ),
                   ),
-
                   const SizedBox(height: 20),
 
+                  
                   CustomButton(
                     text: "Continue ➜",
                     onTap: () async {
-                      if (selectedIndex == null) {
+                      if (selectedIndexes.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Please select an exercise"),
-                            backgroundColor: Colors.red,
-                            duration: Duration(seconds: 2),
+                            content: Text("Please select at least one category"),
                           ),
                         );
                         return;
                       }
 
-                      // حفظ الاختيار في Firestore
+                     
+                      final selectedCategories = selectedIndexes
+                          .map((i) => categories[i]["title"] as String)
+                          .toList();
+
                       final uid = FirebaseAuth.instance.currentUser!.uid;
+
                       try {
+                        
                         await _firestoreService.saveAnswer(
                           uid: uid,
-                          fieldName: "exercise_preference",
-                          value: exercises[selectedIndex!]["title"],
+                          fieldName: "seller_categories",
+                          value: selectedCategories,
                         );
-                        print("✅ Exercise preference saved: ${exercises[selectedIndex!]["title"]}");
-                      } catch (e) {
-                        print("❌ Failed to save exercise preference: $e");
-                      }
 
-                      // الانتقال للصفحة التالية
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Ass11(),
-                        ),
-                      );
+                        
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SellingMethodPage(),
+                          ),
+                        );
+                      } catch (e) {
+                        print(" Failed to save categories: $e");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Error saving categories"),
+                          ),
+                        );
+                      }
                     },
                   ),
-
                   const SizedBox(height: 10),
                 ],
               ),

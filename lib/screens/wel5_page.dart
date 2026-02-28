@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gymunity/screens/selection_page.dart';
+import 'package:gymunity/screens/signin_page.dart';
 import 'package:gymunity/screens/wel4_page.dart';
 import 'package:gymunity/widget/navigator.dart';
 import 'package:gymunity/widget/progress_bar.dart';
@@ -103,7 +103,7 @@ class Wel5Page extends StatelessWidget {
                           color: Colors.black,
                         ),
                         onPressed: () {
-                          navigateWithAnimation(context, RoleSelectionPage());
+                          navigateWithAnimation(context, SigninPage());
                         },
                       ),
                     ),

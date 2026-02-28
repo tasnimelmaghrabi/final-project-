@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gymunity/screens/ass_13.dart';
 import 'package:gymunity/screens/All_Supplements_Sheet.dart';
+import 'package:gymunity/screens/ass_13.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gymunity/services/firestore_service.dart';
 
 class SupplementPage extends StatefulWidget {
   const SupplementPage({super.key});
@@ -13,38 +15,30 @@ class SupplementPage extends StatefulWidget {
 
 class SupplementPageState extends State<SupplementPage> {
   final List<String> supplements = [
-    "Protein",
-    "Vitamin D",
-    "Tumeric",
-    "Collagen",
-    "Green Tea Extract",
-    "Magnesium",
-    "Multi-Vitamin",
-    "Omega-3",
-    "Omega 8",
-    "Vitamin B",
-    "L-Arginine",
-    "BCAAs",
-    "Whey",
-    "Iron",
-    "Vitamin C",
-    "Vitamin A",
-    "Probiotics",
-    "Calcium",
-    "Fish Oil",
-    "L-Carnitine",
-    "EAA",
-    "Melatonin",
-    "Biotin",
-    "K2 + D3",
-    "CoQ10",
-    "Glutamine",
-    "Sodium",
-    "Potassium",
-    "Chromium"
-  ].toSet().toList(); 
+    "Protein","Vitamin D","Tumeric","Collagen","Green Tea Extract","Magnesium",
+    "Multi-Vitamin","Omega-3","Omega 8","Vitamin B","L-Arginine","BCAAs",
+    "Whey","Iron","Vitamin C","Vitamin A","Probiotics","Calcium","Fish Oil",
+    "L-Carnitine","EAA","Melatonin","Biotin","K2 + D3","CoQ10","Glutamine",
+    "Sodium","Potassium","Chromium"
+  ].toSet().toList();
 
   final List<String> selectedSupplements = [];
+
+  final FirestoreService _firestoreService = FirestoreService();
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  Future<void> _saveAndContinue() async {
+    await _firestoreService.saveAnswer(
+      uid: uid,
+      fieldName: "selected_supplements",
+      value: selectedSupplements,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CalorieGoalPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,23 +47,20 @@ class SupplementPageState extends State<SupplementPage> {
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(currentStep: 12, totalSteps: 15),
+            AppBarrr(currentStep: 12, totalSteps: 14),
             const SizedBox(height: 20),
 
-            
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
+                  const Center(
                     child: Column(
-                      children: const [
+                      children: [
                         Text(
                           "Specify Supplement",
                           style: TextStyle(
-                            fontFamily: "Work Sans",
-                            color: Colors.black,
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                           ),
@@ -77,15 +68,12 @@ class SupplementPageState extends State<SupplementPage> {
                         SizedBox(height: 5),
                         Text(
                           "Please specify your supplement.",
-                          style: TextStyle(
-                            fontFamily: "Work Sans",
-                            fontSize: 15,
-                            color: Color(0xff676C75),
-                          ),
+                          style: TextStyle(color: Color(0xff676C75)),
                         ),
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 35),
 
                   Row(
@@ -93,23 +81,26 @@ class SupplementPageState extends State<SupplementPage> {
                     children: [
                       const Text(
                         "Most Common",
-                        style: TextStyle(
-                          fontFamily: "Work Sans",
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          showAllSupplements(context);
+                        onTap: () async {
+                          final result = await showAllSupplements(
+                            context,
+                            selectedSupplements,
+                          );
+
+                          if (result != null) {
+                            setState(() {
+                              selectedSupplements
+                                ..clear()
+                                ..addAll(result);
+                            });
+                          }
                         },
                         child: const Text(
                           "See All Supplements",
-                          style: TextStyle(
-                            color: Color(0xff2563EB),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(color: Color(0xff2563EB)),
                         ),
                       ),
                     ],
@@ -122,46 +113,36 @@ class SupplementPageState extends State<SupplementPage> {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Wrap(
+                        direction: Axis.vertical,
                         spacing: 6,
                         runSpacing: 6,
-                        direction: Axis.vertical,
                         children: supplements.map((item) {
-                          final bool isSelected = selectedSupplements.contains(item);
+                          final isSelected =
+                              selectedSupplements.contains(item);
 
                           return GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (isSelected) {
-                                  selectedSupplements.remove(item);
-                                } else {
-                                  selectedSupplements.add(item);
-                                }
+                                isSelected
+                                    ? selectedSupplements.remove(item)
+                                    : selectedSupplements.add(item);
                               });
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              margin: const EdgeInsets.only(bottom: 6),
+                                  horizontal: 16, vertical: 10),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? const Color(0xffF97316).withOpacity(0.8)
+                                    ? const Color(0xffF97316)
                                     : const Color(0xffF3F3F4),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? const Color.fromARGB(255, 250, 209, 148)
-                                      : Colors.grey.shade200,
-                                  width: 2,
-                                ),
                               ),
                               child: Text(
                                 item,
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.black,
                                 ),
                               ),
                             ),
@@ -172,10 +153,12 @@ class SupplementPageState extends State<SupplementPage> {
                   ),
 
                   const SizedBox(height: 30),
+
                   const Text(
                     "Selected",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
+
                   const SizedBox(height: 10),
 
                   SingleChildScrollView(
@@ -183,17 +166,14 @@ class SupplementPageState extends State<SupplementPage> {
                     child: Row(
                       children: selectedSupplements.map((item) {
                         return Container(
-                          margin: const EdgeInsets.only(right: 10),
+                          margin: const EdgeInsets.only(right: 8),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: const Color(0xffDBEAFE),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 item,
@@ -211,8 +191,8 @@ class SupplementPageState extends State<SupplementPage> {
                                 },
                                 child: const Icon(
                                   Icons.close,
-                                  color: Colors.blue,
-                                  size: 18,
+                                  size: 16,
+                                  color: Color(0xff2563EB),
                                 ),
                               ),
                             ],
@@ -226,20 +206,8 @@ class SupplementPageState extends State<SupplementPage> {
 
                   CustomButton(
                     text: "Continue ➜",
-                    onTap: () {
-                      print("Selected supplements:");
-                      print(selectedSupplements);
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CalorieGoalPage(),
-                        ),
-                      );
-                    },
+                    onTap: _saveAndContinue,
                   ),
-
-                  const SizedBox(height: 20),
                 ],
               ),
             ),

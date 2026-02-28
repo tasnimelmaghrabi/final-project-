@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_5.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gymunity/services/firestore_service.dart';
 
 class Ass4 extends StatefulWidget {
   const Ass4({super.key});
@@ -12,6 +14,50 @@ class Ass4 extends StatefulWidget {
 
 class _Ass4State extends State<Ass4> {
   int selectedAge = 18;
+  final FirestoreService _firestoreService = FirestoreService();
+  late FixedExtentScrollController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = FixedExtentScrollController(initialItem: selectedAge - 1);
+    _loadPreviousAge();
+  }
+
+  void _loadPreviousAge() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final previous = await _firestoreService.getAnswer(
+      uid: uid,
+      fieldName: "age",
+    );
+    if (previous != null) {
+      setState(() {
+        selectedAge = previous as int;
+        _controller = FixedExtentScrollController(initialItem: selectedAge - 1);
+      });
+    }
+  }
+
+  Future<void> _saveAge() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestoreService.saveAnswer(
+        uid: uid,
+        fieldName: "age",
+        value: selectedAge,
+      );
+    } catch (e) {
+      print("❌ Failed to save age: $e");
+    }
+  }
+
+  void _onContinue() async {
+    await _saveAge();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PrevExperience()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +66,8 @@ class _Ass4State extends State<Ass4> {
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(
-      currentStep: 4,
-      totalSteps: 15,
-    ),
-   
+            AppBarrr(currentStep: 4, totalSteps: 14),
             const SizedBox(height: 10),
-
             const Text(
               "What is your age?",
               style: TextStyle(
@@ -36,16 +77,13 @@ class _Ass4State extends State<Ass4> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-
             const SizedBox(height: 55),
-
             SizedBox(
               height: 340,
               child: ListWheelScrollView.useDelegate(
+                controller: _controller,
                 itemExtent: 100,
                 physics: const FixedExtentScrollPhysics(),
-                controller: FixedExtentScrollController(
-                    initialItem: selectedAge - 1),
                 onSelectedItemChanged: (index) {
                   setState(() {
                     selectedAge = index + 1;
@@ -56,7 +94,6 @@ class _Ass4State extends State<Ass4> {
                   builder: (context, index) {
                     final age = index + 1;
                     final isSelected = age == selectedAge;
-
                     return Center(
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
@@ -85,23 +122,12 @@ class _Ass4State extends State<Ass4> {
                 ),
               ),
             ),
-
             const SizedBox(height: 35),
-
             Padding(
               padding: const EdgeInsets.only(bottom: 45, left: 30, right: 30),
               child: CustomButton(
                 text: "Continue ➜",
-                onTap: () {
-                  print("User continued with age: $selectedAge");
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PrevExperience(),
-                    ),
-                  );
-                },
+                onTap: _onContinue,
               ),
             ),
           ],

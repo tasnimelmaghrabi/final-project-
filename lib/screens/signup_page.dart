@@ -1,36 +1,122 @@
 import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_1.dart';
-import 'package:gymunity/widget/tap_effect.dart';
-import 'signin_page.dart';
+import 'package:gymunity/screens/coach_1.dart';
+import 'package:gymunity/screens/reset_pass.dart';
+import 'package:gymunity/services/auth_service.dart';
 import '../widget/custom_textfield.dart';
+import '../widget/tap_effect.dart';
+import '../widget/custom_button.dart';
+import 'signin_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => SignUpPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends State<SignUpPage> {
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
+  final AuthService _authService = AuthService();
+
+  String selectedRole = 'user';
   String? errorMessage;
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> handleSignUp() async {
+  String firstName = firstNameController.text.trim();
+  String lastName = lastNameController.text.trim();
+  String email = emailController.text.trim();
+  String password = passwordController.text.trim();
+  String confirmPassword = confirmPasswordController.text.trim();
+
+  if (firstName.isEmpty ||
+      lastName.isEmpty ||
+      email.isEmpty ||
+      password.isEmpty ||
+      confirmPassword.isEmpty) {
+    setState(() {
+      errorMessage = "All fields are required";
+    });
+    return;
+  }
+
+  if (password != confirmPassword) {
+    setState(() {
+      errorMessage = "Passwords do not match";
+    });
+    return;
+  }
+
+  setState(() {
+    isLoading = true;
+    errorMessage = null;
+  });
+
+  String? result = await _authService.signup(
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    password: password,
+    confirmPassword: confirmPassword,
+    role: selectedRole,
+  );
+
+  setState(() {
+    isLoading = false;
+  });
+
+  if (result == null) {
+ 
+    Widget nextPage;
+
+    if (selectedRole == "coach") {
+      nextPage = const CoachFitnessAreasPage();
+    } else if (selectedRole == "seller") {
+      nextPage = const SellerFitnessCategoryPage();
+    } else {
+      nextPage = const FitGoalPage();
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => nextPage),
+      (route) => false,
+    );
+  } else {
+    setState(() {
+      errorMessage = result;
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    final fieldWidth = screenWidth * 0.9;
-
     return Scaffold(
       backgroundColor: const Color(0xFFFEFEFE),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            
             Stack(
               alignment: Alignment.center,
               children: [
@@ -76,8 +162,10 @@ class SignUpPageState extends State<SignUpPage> {
                       Text(
                         "Quickly make your account in 1 minute",
                         style: TextStyle(
+                          fontFamily: "Work Sans",
                           fontSize: screenHeight * 0.02,
                           color: Colors.black,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -91,204 +179,108 @@ class SignUpPageState extends State<SignUpPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Email Address",
-                      style: TextStyle(
-                        fontFamily: "Work Sans",
-                        fontSize: screenHeight * 0.022,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.008),
-                  SizedBox(
-                    width: fieldWidth,
-                    child: CustomTextfield(
-                      hinttext: "Enter email",
-                      controller: emailController,
-                      icon: Icons.email,
-                    ),
+                  CustomTextField(
+                    label: " Name",
+                    hintText: "Enter your first name",
+                    controller: firstNameController,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Password",
-                      style: TextStyle(
-                        fontFamily: "Work Sans",
-                        fontSize: screenHeight * 0.022,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.008),
-                  SizedBox(
-                    width: fieldWidth,
-                    child: CustomTextfield(
-                      hinttext: "Enter password",
-                      ispassword: true,
-                      controller: passwordController,
-                      icon: Icons.lock,
-                    ),
+                  CustomTextField(
+                    label: "Last Name",
+                    hintText: "Enter your last name",
+                    controller: lastNameController,
                   ),
                   SizedBox(height: screenHeight * 0.02),
-
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Confirm Password",
-                      style: TextStyle(
-                        fontFamily: "Work Sans",
-                        fontSize: screenHeight * 0.022,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  CustomTextField(
+                    label: "Email",
+                    hintText: "Enter your email",
+                    controller: emailController,
                   ),
-                  SizedBox(height: screenHeight * 0.008),
-                  SizedBox(
-                    width: fieldWidth,
-                    child: CustomTextfield(
-                      hinttext: "Re-enter password",
-                      ispassword: true,
-                      controller: confirmPasswordController,
-                      icon: Icons.lock,
-                      hasError: errorMessage != null,
+                  SizedBox(height: screenHeight * 0.02),
+                  CustomTextField(
+                    label: "Password",
+                    hintText: "Enter password",
+                    controller: passwordController,
+                    icon: Icons.lock,
+                    isPassword: true,
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  CustomTextField(
+                    label: "Confirm Password",
+                    hintText: "Re-enter password",
+                    controller: confirmPasswordController,
+                    icon: Icons.lock,
+                    isPassword: true,
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  DropdownButtonFormField<String>(
+                    value: selectedRole,
+                    decoration: const InputDecoration(
+                      labelText: "Select Role",
+                      border: OutlineInputBorder(),
                     ),
+                    items: const [
+                      DropdownMenuItem(value: 'user', child: Text('User')),
+                      DropdownMenuItem(value: 'seller', child: Text('Seller')),
+                      DropdownMenuItem(value: 'coach', child: Text('Coach')),
+                    ],
+                    onChanged: (value) {
+                      setState(() { selectedRole = value!; });
+                    },
                   ),
 
-                  if (errorMessage != null) ...[
-                    SizedBox(height: screenHeight * 0.012),
-                    Container(
-                      width: fieldWidth,
-                      padding: EdgeInsets.all(screenHeight * 0.015),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEE2E2),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.red, width: 1.5),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            color: Colors.red,
-                          ),
-                          SizedBox(width: screenWidth * 0.02),
-                          Expanded(
-                            child: Text(
-                              errorMessage!,
-                              style: TextStyle(
-                                fontFamily: "Work Sans",
-                                color: Colors.red,
-                                fontSize: screenHeight * 0.018,
-                              ),
-                            ),
-                          ),
-                        ],
+                  if (errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        errorMessage!,
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
-                  ],
 
                   SizedBox(height: screenHeight * 0.02),
 
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.018,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(13),
-                          ),
-                          elevation: 6,
-                        ),
-                        onPressed: () {
-                          String email = emailController.text;
-                          String password = passwordController.text;
-                          String confirmPassword =
-                              confirmPasswordController.text;
-
-                          if (password != confirmPassword) {
-                            setState(() {
-                              errorMessage = "Error: Passwords don't match!";
-                            });
-                            return;
-                          } else {
-                            setState(() {
-                              errorMessage = null;
-                            });
-                          }
-
-                          print('Email: $email');
-                          print('Password: $password');
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FitGoalPage(),
-                            ),
-                          );
-                          emailController.clear();
-                          passwordController.clear();
-                          confirmPasswordController.clear();
-                        },
-                        child: Text(
-                          "Sign Up ➜",
-                          style: TextStyle(
-                            fontFamily: "Work Sans",
-                            fontSize: screenHeight * 0.022,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
+                  CustomButton(
+                    text: "Sign Up ➜",
+                    onTap: isLoading ? null : handleSignUp,
                   ),
 
-                  SizedBox(height: screenHeight * 0.05),
+                  SizedBox(height: screenHeight * 0.02),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Already have an account? ",
                         style: TextStyle(
-                          fontFamily: "Work Sans",
                           color: Color(0xff676C75),
-
+                          fontSize: 14,
+                          fontFamily: "Work Sans",
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       TapEffect(
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => SigninPage(),
-                            ),
+                            MaterialPageRoute(builder: (_) => const SigninPage()),
                           );
                         },
                         child: const Text(
                           "Sign In",
                           style: TextStyle(
-                            fontFamily: "Work Sans",
                             color: Color(0xFFF97316),
-                            fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
-                            decorationColor: Color(0xFFF97316),
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Work Sans",
                           ),
                         ),
                       ),
                     ],
                   ),
 
-                  SizedBox(height: screenHeight * 0.04),
+                  SizedBox(height: screenHeight * 0.03),
                 ],
               ),
             ),

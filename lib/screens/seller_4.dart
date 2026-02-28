@@ -1,52 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:gymunity/screens/ass_2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
 import 'package:gymunity/services/firestore_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'home_page.dart'; 
 
-class FitGoalPage extends StatefulWidget {
-  const FitGoalPage({super.key});
+class SellerGoalPage extends StatefulWidget {
+  const SellerGoalPage({super.key});
 
   @override
-  State<FitGoalPage> createState() => FitGoalPageState();
+  State<SellerGoalPage> createState() => SellerGoalPageState();
 }
 
-class FitGoalPageState extends State<FitGoalPage> {
+class SellerGoalPageState extends State<SellerGoalPage> {
   int selectedIndex = -1;
   final FirestoreService _firestoreService = FirestoreService();
 
-  final List<Map<String, dynamic>> moodOptions = [
-    {"text": "I wanna lose weight", "icon": Icons.monitor_weight},
-    {"text": "I wanna try AI Coach", "icon": Icons.smart_toy_outlined},
-    {"text": "I wanna get bulks", "icon": Icons.fitness_center_outlined},
-    {"text": "I wanna gain endurance", "icon": Icons.monitor_heart_outlined},
-    {"text": "Just trying out the app! 👍", "icon": Icons.phone_iphone},
+  final List<Map<String, dynamic>> goalOptions = [
+    {"text": "Increase my sales", "icon": Icons.trending_up},
+    {"text": "Reach fitness-interested clients", "icon": Icons.people_alt_outlined},
+    {"text": "Promote my products", "icon": Icons.campaign_outlined},
+    {"text": "Build a strong brand", "icon": Icons.branding_watermark_outlined},
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPreviousSelection();
-  }
-
-  // تحميل الاختيار السابق من Firestore
-  void _loadPreviousSelection() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final previous = await _firestoreService.getAnswer(
-      uid: uid,
-      fieldName: "fit_goal",
-    );
-
-    if (previous != null) {
-      final index = moodOptions.indexWhere((m) => m["text"] == previous);
-      if (index != -1) {
-        setState(() {
-          selectedIndex = index;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +30,10 @@ class FitGoalPageState extends State<FitGoalPage> {
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(currentStep: 1, totalSteps: 14),
+            AppBarrr(currentStep: 4, totalSteps: 4),
             const SizedBox(height: 25),
             const Text(
-              "What’s your fitness\n goal/target?",
+              "What is your main goal\nusing the app?",
               style: TextStyle(
                 fontFamily: "Work Sans",
                 color: Colors.black,
@@ -67,17 +42,17 @@ class FitGoalPageState extends State<FitGoalPage> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 70),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: List.generate(
-                  moodOptions.length,
+                  goalOptions.length,
                   (index) => Column(
                     children: [
-                      MoodItem(
-                        text: moodOptions[index]["text"],
-                        icon: moodOptions[index]["icon"],
+                      GoalItem(
+                        text: goalOptions[index]["text"],
+                        icon: goalOptions[index]["icon"],
                         isSelected: selectedIndex == index,
                         onTap: () {
                           setState(() => selectedIndex = index);
@@ -89,44 +64,33 @@ class FitGoalPageState extends State<FitGoalPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 60),
             CustomButton(
-              text: "Continue ➜",
+              text: "Finish",
               onTap: () async {
-                if (selectedIndex == -1) {
-                  // التنبيه على عدم الاختيار فقط
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Please select your fitness goal"),
-                    ),
-                  );
-                  return;
-                }
+                if (selectedIndex == -1) return; // لو مش محدد حاجة، متعملش حاجة
 
                 final uid = FirebaseAuth.instance.currentUser!.uid;
-                final selectedGoal = moodOptions[selectedIndex]["text"];
+                final selectedGoal = goalOptions[selectedIndex]["text"] as String;
 
                 try {
-                  // الحفظ بدون أي SnackBar تأكيد
+                  // 1️⃣ حفظ الهدف في Answers
                   await _firestoreService.saveAnswer(
                     uid: uid,
-                    fieldName: "fit_goal",
+                    fieldName: "seller_main_goal",
                     value: selectedGoal,
                   );
 
-                  Navigator.push(
+                  // 2️⃣ تحديث onboardingCompleted = true
+                  await _firestoreService.setOnboardingCompleted(uid);
+
+                  // 3️⃣ الانتقال للـ HomePage
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => GenderSelectionPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const HomePage()),
                   );
                 } catch (e) {
-                  print("❌ Failed to save fitness goal: $e");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Error saving fitness goal"),
-                    ),
-                  );
+                  print("Failed to save seller main goal or onboarding: $e");
                 }
               },
             ),
@@ -138,13 +102,13 @@ class FitGoalPageState extends State<FitGoalPage> {
   }
 }
 
-class MoodItem extends StatelessWidget {
+class GoalItem extends StatelessWidget {
   final String text;
   final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const MoodItem({
+  const GoalItem({
     super.key,
     required this.text,
     required this.icon,
@@ -161,12 +125,12 @@ class MoodItem extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFF6D00) : Color(0xffF3F3F4),
+          color: isSelected ? const Color(0xFFFF6D00) : const Color(0xffF3F3F4),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: isSelected
                 ? const Color.fromARGB(255, 247, 186, 139)
-                : Color.fromARGB(255, 230, 230, 230),
+                : const Color.fromARGB(255, 230, 230, 230),
             width: 2,
           ),
           boxShadow: [
@@ -201,9 +165,7 @@ class MoodItem extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isSelected
-                      ? Colors.white
-                      : Color.fromARGB(255, 70, 70, 70),
+                  color: isSelected ? Colors.white : Colors.black54,
                   width: 2.2,
                 ),
               ),

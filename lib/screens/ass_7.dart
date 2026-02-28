@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_8.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
+import 'package:gymunity/services/firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Ass7 extends StatefulWidget {
   const Ass7({super.key});
@@ -12,6 +14,39 @@ class Ass7 extends StatefulWidget {
 
 class _Ass7State extends State<Ass7> {
   final TextEditingController _controller = TextEditingController();
+  final FirestoreService _firestoreService = FirestoreService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreviousData();
+  }
+
+  // استرجاع النص السابق من Firestore
+  void _loadPreviousData() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final previous = await _firestoreService.getAnswer(
+      uid: uid,
+      fieldName: "physical_limitations",
+    );
+    if (previous != null) {
+      _controller.text = previous.toString();
+    }
+  }
+
+  Future<void> _saveData() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestoreService.saveAnswer(
+        uid: uid,
+        fieldName: "physical_limitations",
+        value: _controller.text.trim(),
+      );
+      print("✅ Physical limitations saved: ${_controller.text.trim()}");
+    } catch (e) {
+      print("❌ Failed to save physical limitations: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +55,9 @@ class _Ass7State extends State<Ass7> {
       body: SafeArea(
         child: Column(
           children: [
-           AppBarrr(currentStep: 7, totalSteps: 15),
-
-            SizedBox(height: 25),
-
-            Text(
+            AppBarrr(currentStep: 7, totalSteps: 14),
+            const SizedBox(height: 25),
+            const Text(
               "Do you have any\n physical limitations?",
               style: TextStyle(
                 fontFamily: "Work Sans",
@@ -34,26 +67,19 @@ class _Ass7State extends State<Ass7> {
               ),
               textAlign: TextAlign.center,
             ),
-
-            SizedBox(height: 40),
-
+            const SizedBox(height: 40),
             Image.asset(
               "assets/images/silver _wheelchair .png",
               width: 200,
               height: 200,
             ),
-
-            SizedBox(height: 15),
-
+            const SizedBox(height: 15),
             _PhysicalLimitationsBox(controller: _controller),
-
-            Spacer(),
-
+            const Spacer(),
             CustomButton(
               text: "Continue ➜",
-              onTap: () {
-                print("Physical limitations: ${_controller.text}");
-                
+              onTap: () async {
+                await _saveData();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -62,18 +88,18 @@ class _Ass7State extends State<Ass7> {
                 );
               },
             ),
-
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 }
+
 class _PhysicalLimitationsBox extends StatefulWidget {
   final TextEditingController controller;
 
-  const _PhysicalLimitationsBox({super.key , required this.controller});
+  const _PhysicalLimitationsBox({required this.controller});
 
   @override
   State<_PhysicalLimitationsBox> createState() =>
@@ -87,9 +113,7 @@ class _PhysicalLimitationsBoxState extends State<_PhysicalLimitationsBox> {
 
   void updateCount(String text) {
     final words = text.trim().split(RegExp(r"\s+"));
-
     if (words.length > maxWords) {
-      
       widget.controller.text = words.sublist(0, maxWords).join(" ");
       widget.controller.selection = TextSelection.fromPosition(
         TextPosition(offset: widget.controller.text.length),
@@ -105,15 +129,15 @@ class _PhysicalLimitationsBoxState extends State<_PhysicalLimitationsBox> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 25),
+      margin: const EdgeInsets.symmetric(horizontal: 25),
       child: Focus(
         onFocusChange: (focus) => setState(() => isFocused = focus),
         child: Container(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
-              color: isFocused ? Color(0xffF97316) : Colors.grey.shade400,
+              color: isFocused ? const Color(0xffF97316) : Colors.grey.shade400,
               width: 2,
             ),
           ),
@@ -124,14 +148,12 @@ class _PhysicalLimitationsBoxState extends State<_PhysicalLimitationsBox> {
                 controller: widget.controller,
                 maxLines: 4,
                 onChanged: updateCount,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Type here...",
                   border: InputBorder.none,
                 ),
               ),
-
-              SizedBox(height: 6),
-
+              const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -140,7 +162,7 @@ class _PhysicalLimitationsBoxState extends State<_PhysicalLimitationsBox> {
                     size: 18,
                     color: Colors.grey.shade600,
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     "$wordCount/$maxWords",
                     style: TextStyle(

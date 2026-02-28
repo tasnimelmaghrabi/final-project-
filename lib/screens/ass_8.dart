@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_9.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gymunity/services/firestore_service.dart';
 
 class DietPreferencePage extends StatefulWidget {
+  const DietPreferencePage({super.key});
+
   @override
   DietPreferencePageState createState() => DietPreferencePageState();
 }
 
 class DietPreferencePageState extends State<DietPreferencePage> {
   int? selectedIndex;
+  final FirestoreService _firestoreService = FirestoreService();
 
   final List<Map<String, dynamic>> diets = [
     {"title": "Plant Based", "subtitle": "Vegan", "icon": Icons.eco},
@@ -19,6 +24,30 @@ class DietPreferencePageState extends State<DietPreferencePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadPreviousSelection();
+  }
+
+  // تحميل الاختيار السابق إذا كان موجود
+  void _loadPreviousSelection() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final previous = await _firestoreService.getAnswer(
+      uid: uid,
+      fieldName: "diet_preference",
+    );
+
+    if (previous != null) {
+      final index = diets.indexWhere((d) => d["title"] == previous);
+      if (index != -1) {
+        setState(() {
+          selectedIndex = index;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -26,7 +55,7 @@ class DietPreferencePageState extends State<DietPreferencePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppBarrr(currentStep: 8, totalSteps: 15),
+            AppBarrr(currentStep: 8, totalSteps: 14),
             const SizedBox(height: 20),
 
             Padding(
@@ -36,7 +65,7 @@ class DietPreferencePageState extends State<DietPreferencePage> {
                 children: [
                   Center(
                     child: Column(
-                      children: [
+                      children: const [
                         Text(
                           "Do you have a specific",
                           style: TextStyle(
@@ -78,10 +107,10 @@ class DietPreferencePageState extends State<DietPreferencePage> {
                             duration: const Duration(milliseconds: 220),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: isSelected ? const Color(0xffF97316) : Color(0xffF3F3F4),
+                              color: isSelected ? const Color(0xffF97316) : const Color(0xffF3F3F4),
                               borderRadius: BorderRadius.circular(18),
                               border: Border.all(
-                                color: isSelected ? Color(0xffFDBA74) : Color(0xffE5E5E5),
+                                color: isSelected ? const Color(0xffFDBA74) : const Color(0xffE5E5E5),
                                 width: 2,
                               ),
                             ),
@@ -126,17 +155,38 @@ class DietPreferencePageState extends State<DietPreferencePage> {
                   const SizedBox(height: 20),
 
                   CustomButton(
-                    text: "continue ➜",
-                    onTap: () {
-                      if (selectedIndex != null) {
-                        print("Selected diet: ${diets[selectedIndex!]["title"]}");
-                      } else {
-                        print("No diet selected");
+                    text: "Continue ➜",
+                    onTap: () async {
+                      if (selectedIndex == null) {
+                        // تحذير لو لم يختار المستخدم أي شيء
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please select a diet preference"),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
                       }
 
+                      // حفظ الاختيار في Firestore
+                      final uid = FirebaseAuth.instance.currentUser!.uid;
+                      final value = diets[selectedIndex!]["title"];
+                      try {
+                        await _firestoreService.saveAnswer(
+                          uid: uid,
+                          fieldName: "diet_preference",
+                          value: value,
+                        );
+                        print("✅ Diet preference saved: $value");
+                      } catch (e) {
+                        print("❌ Failed to save diet preference: $e");
+                      }
+
+                      // الانتقال للصفحة التالية
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => CommitmentScreen()),
+                        MaterialPageRoute(builder: (context) => const CommitmentScreen()),
                       );
                     },
                   ),

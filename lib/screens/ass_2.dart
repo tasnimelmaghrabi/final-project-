@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_3.dart';
-import 'package:gymunity/screens/ass_4.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
 import 'package:gymunity/widget/tap_effect.dart';
+import 'package:gymunity/services/firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class GenderSelectionPage extends StatefulWidget {
   const GenderSelectionPage({super.key});
@@ -15,6 +16,56 @@ class GenderSelectionPage extends StatefulWidget {
 class _GenderSelectionPageState extends State<GenderSelectionPage> {
   String? selectedGender;
   bool showSkipBar = true;
+  final FirestoreService _firestoreService = FirestoreService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreviousSelection();
+  }
+
+  // استرجاع الاختيار السابق لو موجود
+  void _loadPreviousSelection() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final previous = await _firestoreService.getAnswer(
+      uid: uid,
+      fieldName: "gender",
+    );
+    if (previous != null) {
+      setState(() {
+        selectedGender = previous as String;
+      });
+    }
+  }
+
+  // حفظ الاختيار أو Skip
+  Future<void> _saveGender(String value) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    try {
+      await _firestoreService.saveAnswer(
+        uid: uid,
+        fieldName: "gender",
+        value: value,
+      );
+    } catch (e) {
+      print("❌ Failed to save gender: $e");
+    }
+  }
+
+  void _onContinue() {
+    if (selectedGender == null) {
+      // لم يختر المستخدم → نحفظ "Skipped"
+      _saveGender("Skipped");
+    } else {
+      // حفظ الاختيار مباشرة
+      _saveGender(selectedGender!);
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => WeightGoalPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +75,8 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppBarrr(currentStep: 2, totalSteps: 15),
-
+            AppBarrr(currentStep: 2, totalSteps: 14),
             const SizedBox(height: 20),
-
             const Center(
               child: Text(
                 "What is your gender?",
@@ -39,40 +88,34 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 40),
-
-           
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
                   GenderItem(
-                    
                     title: "Male",
                     image: "assets/images/man _running.png",
                     isSelected: selectedGender == "Male",
                     onTap: () {
                       setState(() => selectedGender = "Male");
+                      _saveGender("Male");
                     },
                   ),
-
                   const SizedBox(height: 10),
-
                   GenderItem(
                     title: "Female",
                     image: "assets/images/woman_ running .png",
                     isSelected: selectedGender == "Female",
                     onTap: () {
                       setState(() => selectedGender = "Female");
+                      _saveGender("Female");
                     },
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height:60),
-
+            const SizedBox(height: 60),
             if (showSkipBar)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -91,10 +134,12 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                         child: Center(
                           child: TapEffect(
                             onTap: () {
+                              // حفظ Skip
+                              _saveGender("Skipped");
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => Ass4(),
+                                  builder: (_) => WeightGoalPage(),
                                 ),
                               );
                             },
@@ -121,19 +166,11 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                   ),
                 ),
               ),
-
-        
-
+            const SizedBox(height: 20),
             CustomButton(
               text: "Continue ➜",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) =>  WeightGoalPage()),
-                );
-              },
+              onTap: _onContinue,
             ),
-
             const SizedBox(height: 10),
           ],
         ),

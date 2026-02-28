@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_14.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gymunity/services/firestore_service.dart';
 
 class CalorieGoalPage extends StatefulWidget {
+  const CalorieGoalPage({super.key});
+
   @override
   State<CalorieGoalPage> createState() => _CalorieGoalPageState();
 }
@@ -11,8 +15,10 @@ class CalorieGoalPage extends StatefulWidget {
 class _CalorieGoalPageState extends State<CalorieGoalPage> {
   bool isKcal = true;
   int valueKcal = 1550;
-
   String? lastPressed;
+
+  final FirestoreService _firestoreService = FirestoreService();
+  final uid = FirebaseAuth.instance.currentUser!.uid;
 
   double get displayedValue =>
       isKcal ? valueKcal.toDouble() : valueKcal * 4.184;
@@ -25,14 +31,14 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
 
   void increase() {
     setState(() {
-      valueKcal += 10; 
+      valueKcal += 10;
       lastPressed = "plus";
     });
   }
 
   void decrease() {
     setState(() {
-      if (valueKcal > 0) valueKcal -= 10; 
+      if (valueKcal > 0) valueKcal -= 10;
       lastPressed = "minus";
     });
   }
@@ -45,6 +51,29 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
     return lastPressed == type ? Color(0xffFDBA74) : Colors.transparent;
   }
 
+  Future<void> _saveCalorieGoal() async {
+    try {
+      await _firestoreService.saveAnswer(
+        uid: uid,
+        fieldName: "calorie_goal",
+        value: {
+          "value_kcal": valueKcal,
+          "unit": isKcal ? "Kcal" : "Joules",
+          "displayed_value": displayedValue,
+        },
+      );
+      print(" Calorie goal saved successfully");
+    } catch (e) {
+      print(" Failed to save calorie goal: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error saving calorie goal. Try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,10 +81,8 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(currentStep: 13, totalSteps: 15),
-
+            AppBarrr(currentStep: 13, totalSteps: 14),
             const SizedBox(height: 20),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22.0),
               child: Column(
@@ -70,7 +97,6 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 35),
                   Container(
                     padding: EdgeInsets.all(3),
@@ -132,18 +158,15 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Text(
-                    "${displayedValue.toStringAsFixed(isKcal ? 0 : 0)}",
+                    displayedValue.toStringAsFixed(isKcal ? 0 : 0),
                     style: TextStyle(
                       fontFamily: "Work Sans",
                       fontSize: 90,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-
                   Text(
                     isKcal ? "calories daily" : "joules daily",
                     style: TextStyle(
@@ -153,7 +176,6 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
                       color: Color(0xff393C43),
                     ),
                   ),
-
                   const SizedBox(height: 35),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -179,9 +201,7 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 20),
-
                       GestureDetector(
                         onTap: increase,
                         child: Container(
@@ -205,16 +225,11 @@ class _CalorieGoalPageState extends State<CalorieGoalPage> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 30),
-
                   CustomButton(
                     text: "Continue ➜",
-                    onTap: () {
-                      print("Unit: ${isKcal ? "Kcal" : "Joules"}");
-                      print("Value (original kcal): $valueKcal");
-                      print("Displayed Value: $displayedValue");
-
+                    onTap: () async {
+                      await _saveCalorieGoal(); 
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => SleepQualityPage()),
