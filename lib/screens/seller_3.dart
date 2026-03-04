@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gymunity/screens/seller_4.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
 import 'package:gymunity/services/firestore_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'seller_4.dart';
 
 class FitnessExperiencePage extends StatefulWidget {
   const FitnessExperiencePage({super.key});
 
   @override
-  State<FitnessExperiencePage> createState() =>
-      _FitnessExperiencePageState();
+  State<FitnessExperiencePage> createState() => _FitnessExperiencePageState();
 }
 
-class _FitnessExperiencePageState
-    extends State<FitnessExperiencePage> {
-  int selectedIndex = -1; 
+class _FitnessExperiencePageState extends State<FitnessExperiencePage> {
+  int selectedIndex = -1;
   final FirestoreService _firestoreService = FirestoreService();
 
   final List<String> experienceOptions = [
@@ -25,16 +24,43 @@ class _FitnessExperiencePageState
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadSelectedExperience();
+  }
+
+  Future<void> _loadSelectedExperience() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedExperience = prefs.getString('fitness_experience');
+    if (savedExperience != null) {
+      final index = experienceOptions.indexOf(savedExperience);
+      if (index != -1) {
+        setState(() {
+          selectedIndex = index;
+        });
+      }
+    }
+  }
+
+  Future<void> _saveExperience(String experience) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    await _firestoreService.saveAnswer(
+      uid: uid,
+      fieldName: "fitness_experience",
+      value: experience,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fitness_experience', experience);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            AppBarrr(
-              currentStep: 3,
-              totalSteps: 4,
-            ),
+            AppBarrr(currentStep: 3, totalSteps: 4),
             const SizedBox(height: 20),
             const Text(
               "What is your experience\nin the Fitness field?",
@@ -70,7 +96,6 @@ class _FitnessExperiencePageState
             CustomButton(
               text: "Continue ➜",
               onTap: () async {
-               
                 if (selectedIndex == -1) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -80,26 +105,17 @@ class _FitnessExperiencePageState
                   return;
                 }
 
-                final uid = FirebaseAuth.instance.currentUser!.uid;
-                final selectedExperience =
-                    experienceOptions[selectedIndex];
-
+                final selectedExperience = experienceOptions[selectedIndex];
                 try {
-                  
-                  await _firestoreService.saveAnswer(
-                    uid: uid,
-                    fieldName: "fitness_experience",
-                    value: selectedExperience,
-                  );
-
+                  await _saveExperience(selectedExperience);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SellerGoalPage(),
+                      builder: (_) => const SellerGoalPage(),
                     ),
                   );
                 } catch (e) {
-                  print(" Failed to save experience: $e");
+                  print("Failed to save experience: $e");
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Error saving experience"),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gymunity/screens/coach_5.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
-import 'package:gymunity/services/firestore_service.dart'; // استدعاء السيرفيس
-import 'package:firebase_auth/firebase_auth.dart'; // استدعاء Firebase Auth
+import 'package:gymunity/services/firestore_service.dart'; 
+import 'package:firebase_auth/firebase_auth.dart'; 
 
 class PreferredClientLevelPage extends StatefulWidget {
   const PreferredClientLevelPage({super.key});
@@ -36,7 +36,7 @@ class _PreferredClientLevelPageState
       loadPreviousSelection();
     } else {
       print("No logged-in user found!");
-      // ممكن هنا تعملي redirect لصفحة تسجيل الدخول
+    
     }
   }
 

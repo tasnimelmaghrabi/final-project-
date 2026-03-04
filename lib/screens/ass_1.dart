@@ -30,7 +30,6 @@ class FitGoalPageState extends State<FitGoalPage> {
     _loadPreviousSelection();
   }
 
-  // تحميل الاختيار السابق من Firestore
   void _loadPreviousSelection() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final previous = await _firestoreService.getAnswer(
@@ -94,7 +93,7 @@ class FitGoalPageState extends State<FitGoalPage> {
               text: "Continue ➜",
               onTap: () async {
                 if (selectedIndex == -1) {
-                  // التنبيه على عدم الاختيار فقط
+               
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Please select your fitness goal"),
@@ -107,7 +106,7 @@ class FitGoalPageState extends State<FitGoalPage> {
                 final selectedGoal = moodOptions[selectedIndex]["text"];
 
                 try {
-                  // الحفظ بدون أي SnackBar تأكيد
+                  
                   await _firestoreService.saveAnswer(
                     uid: uid,
                     fieldName: "fit_goal",
@@ -121,7 +120,7 @@ class FitGoalPageState extends State<FitGoalPage> {
                     ),
                   );
                 } catch (e) {
-                  print("❌ Failed to save fitness goal: $e");
+                  print(" Failed to save fitness goal: $e");
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Error saving fitness goal"),

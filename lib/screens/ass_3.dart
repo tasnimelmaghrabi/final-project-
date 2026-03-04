@@ -27,7 +27,7 @@ class _WeightGoalPageState extends State<WeightGoalPage> {
     _loadPreviousWeight();
   }
 
-  // استرجاع الوزن والوحدة السابقة
+  
   void _loadPreviousWeight() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -98,7 +98,7 @@ class _WeightGoalPageState extends State<WeightGoalPage> {
         value: isKg ? "Kg" : "Lbs",
       );
     } catch (e) {
-      print("❌ Failed to save weight: $e");
+      print(" Failed to save weight: $e");
     }
   }
 

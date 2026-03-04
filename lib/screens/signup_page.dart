@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymunity/screens/ass_1.dart';
 import 'package:gymunity/screens/coach_1.dart';
-import 'package:gymunity/screens/reset_pass.dart';
+import 'package:gymunity/screens/seller_1.dart';
 import 'package:gymunity/services/auth_service.dart';
 import '../widget/custom_textfield.dart';
 import '../widget/tap_effect.dart';

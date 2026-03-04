@@ -33,7 +33,7 @@ class _ExperienceYearsPageState extends State<ExperienceYearsPage> {
       loadPreviousSelection();
     } else {
       print("No logged-in user found!");
-      // هنا ممكن تعملي redirect لصفحة تسجيل الدخول
+      
     }
   }
 

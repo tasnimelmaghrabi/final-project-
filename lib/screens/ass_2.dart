@@ -24,7 +24,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
     _loadPreviousSelection();
   }
 
-  // استرجاع الاختيار السابق لو موجود
+ 
   void _loadPreviousSelection() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final previous = await _firestoreService.getAnswer(
@@ -38,7 +38,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
     }
   }
 
-  // حفظ الاختيار أو Skip
+ 
   Future<void> _saveGender(String value) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     try {
@@ -48,16 +48,16 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
         value: value,
       );
     } catch (e) {
-      print("❌ Failed to save gender: $e");
+      print(" Failed to save gender: $e");
     }
   }
 
   void _onContinue() {
     if (selectedGender == null) {
-      // لم يختر المستخدم → نحفظ "Skipped"
+     
       _saveGender("Skipped");
     } else {
-      // حفظ الاختيار مباشرة
+      
       _saveGender(selectedGender!);
     }
 
@@ -134,7 +134,7 @@ class _GenderSelectionPageState extends State<GenderSelectionPage> {
                         child: Center(
                           child: TapEffect(
                             onTap: () {
-                              // حفظ Skip
+                             
                               _saveGender("Skipped");
                               Navigator.pushReplacement(
                                 context,

@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
 import 'package:gymunity/services/firestore_service.dart';
-import 'home_page.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'home_page.dart';
 
 class SellerGoalPage extends StatefulWidget {
   const SellerGoalPage({super.key});
@@ -22,6 +23,38 @@ class SellerGoalPageState extends State<SellerGoalPage> {
     {"text": "Promote my products", "icon": Icons.campaign_outlined},
     {"text": "Build a strong brand", "icon": Icons.branding_watermark_outlined},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedGoal();
+  }
+
+  Future<void> _loadSavedGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedGoal = prefs.getString('seller_main_goal');
+    if (savedGoal != null) {
+      final index = goalOptions.indexWhere((g) => g["text"] == savedGoal);
+      if (index != -1) {
+        setState(() {
+          selectedIndex = index;
+        });
+      }
+    }
+  }
+
+  Future<void> _saveGoal(String goal) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    await _firestoreService.saveAnswer(
+      uid: uid,
+      fieldName: "seller_main_goal",
+      value: goal,
+    );
+    await _firestoreService.setOnboardingCompleted(uid);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('seller_main_goal', goal);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,23 +101,11 @@ class SellerGoalPageState extends State<SellerGoalPage> {
             CustomButton(
               text: "Finish",
               onTap: () async {
-                if (selectedIndex == -1) return; // لو مش محدد حاجة، متعملش حاجة
+                if (selectedIndex == -1) return;
 
-                final uid = FirebaseAuth.instance.currentUser!.uid;
                 final selectedGoal = goalOptions[selectedIndex]["text"] as String;
-
                 try {
-                  // 1️⃣ حفظ الهدف في Answers
-                  await _firestoreService.saveAnswer(
-                    uid: uid,
-                    fieldName: "seller_main_goal",
-                    value: selectedGoal,
-                  );
-
-                  // 2️⃣ تحديث onboardingCompleted = true
-                  await _firestoreService.setOnboardingCompleted(uid);
-
-                  // 3️⃣ الانتقال للـ HomePage
+                  await _saveGoal(selectedGoal);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const HomePage()),

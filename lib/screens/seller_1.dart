@@ -4,6 +4,7 @@ import 'package:gymunity/screens/seller_2.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
 import 'package:gymunity/services/firestore_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SellerFitnessCategoryPage extends StatefulWidget {
   const SellerFitnessCategoryPage({super.key});
@@ -16,8 +17,6 @@ class SellerFitnessCategoryPage extends StatefulWidget {
 class SellerFitnessCategoryPageState
     extends State<SellerFitnessCategoryPage> {
   Set<int> selectedIndexes = {};
-
- 
   final FirestoreService _firestoreService = FirestoreService();
 
   final List<Map<String, dynamic>> categories = [
@@ -28,6 +27,28 @@ class SellerFitnessCategoryPageState
     {"title": "Training Programs", "icon": Icons.assignment},
     {"title": "Other", "icon": Icons.settings},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSelectedCategories();
+  }
+
+  Future<void> _loadSelectedCategories() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedCategories = prefs.getStringList("seller_categories") ?? [];
+    setState(() {
+      selectedIndexes = savedCategories
+          .map((title) => categories.indexWhere((c) => c["title"] == title))
+          .where((index) => index != -1)
+          .toSet();
+    });
+  }
+
+  Future<void> _saveSelectedCategories(List<String> selectedCategories) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList("seller_categories", selectedCategories);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,21 +157,19 @@ class SellerFitnessCategoryPageState
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  
                   CustomButton(
                     text: "Continue ➜",
                     onTap: () async {
                       if (selectedIndexes.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Please select at least one category"),
+                            content:
+                                Text("Please select at least one category"),
                           ),
                         );
                         return;
                       }
 
-                     
                       final selectedCategories = selectedIndexes
                           .map((i) => categories[i]["title"] as String)
                           .toList();
@@ -158,18 +177,21 @@ class SellerFitnessCategoryPageState
                       final uid = FirebaseAuth.instance.currentUser!.uid;
 
                       try {
-                        
+                       
                         await _firestoreService.saveAnswer(
                           uid: uid,
                           fieldName: "seller_categories",
                           value: selectedCategories,
                         );
 
-                        
+                       
+                        await _saveSelectedCategories(selectedCategories);
+
+                       
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SellingMethodPage(),
+                            builder: (context) => const SellingMethodPage(),
                           ),
                         );
                       } catch (e) {

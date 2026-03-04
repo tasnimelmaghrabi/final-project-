@@ -37,7 +37,7 @@ class CoachFitnessAreasPageState extends State<CoachFitnessAreasPage> {
       loadPreviousSelections();
     } else {
       print("No logged-in user found!");
-      // هنا ممكن تحطي redirect لصفحة تسجيل الدخول
+     
     }
   }
 

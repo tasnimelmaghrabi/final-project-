@@ -4,6 +4,7 @@ import 'package:gymunity/screens/seller_3.dart';
 import 'package:gymunity/widget/app_barrr.dart';
 import 'package:gymunity/widget/custom_button.dart';
 import 'package:gymunity/services/firestore_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SellingMethodPage extends StatefulWidget {
   const SellingMethodPage({super.key});
@@ -14,7 +15,6 @@ class SellingMethodPage extends StatefulWidget {
 
 class _SellingMethodPageState extends State<SellingMethodPage> {
   int selectedIndex = -1; 
-
   final FirestoreService _firestoreService = FirestoreService();
 
   final List<String> sellingOptions = [
@@ -22,6 +22,30 @@ class _SellingMethodPageState extends State<SellingMethodPage> {
     "Physical Store / Gym",
     "Both",
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSelectedMethod();
+  }
+
+  Future<void> _loadSelectedMethod() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedMethod = prefs.getString("selling_method");
+    if (savedMethod != null) {
+      final index = sellingOptions.indexOf(savedMethod);
+      if (index != -1) {
+        setState(() {
+          selectedIndex = index;
+        });
+      }
+    }
+  }
+
+  Future<void> _saveSelectedMethod(String method) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("selling_method", method);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +93,6 @@ class _SellingMethodPageState extends State<SellingMethodPage> {
             CustomButton(
               text: "Continue ➜",
               onTap: () async {
-                
                 if (selectedIndex == -1) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -83,18 +106,21 @@ class _SellingMethodPageState extends State<SellingMethodPage> {
                 final uid = FirebaseAuth.instance.currentUser!.uid;
 
                 try {
-                  
+                  // حفظ في Firestore
                   await _firestoreService.saveAnswer(
                     uid: uid,
                     fieldName: "selling_method",
                     value: selectedMethod,
                   );
 
-                  
+                  // حفظ في SharedPreferences
+                  await _saveSelectedMethod(selectedMethod);
+
+                  // الانتقال للصفحة التالية
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => FitnessExperiencePage(),
+                      builder: (_) => const FitnessExperiencePage(),
                     ),
                   );
                 } catch (e) {
@@ -136,9 +162,7 @@ class SellingOptionItem extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xffF97316)
-              : const Color(0xffF3F3F4),
+          color: isSelected ? const Color(0xffF97316) : const Color(0xffF3F3F4),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: isSelected ? Colors.white : Colors.transparent,

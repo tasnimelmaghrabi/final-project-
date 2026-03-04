@@ -118,13 +118,13 @@ class CoachGoalPageState extends State<CoachGoalPage> {
                 if (selectedIndex == -1) return;
 
                 try {
-                  // 1️⃣ حفظ الهدف
+                
                   await saveSelection();
 
-                  // 2️⃣ تحديد إن الـ onboarding خلص
+                  
                   await firestoreService.setOnboardingCompleted(uid);
 
-                  // 3️⃣ الانتقال للـ HomePage
+                 
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const HomePage()),
